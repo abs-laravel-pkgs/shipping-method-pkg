@@ -1,4 +1,4 @@
-@if(config('SHIPPING_METHOD_PKG.DEV'))
+@if(config('shipping-method-pkg.DEV'))
     <?php $shipping_method_pkg_prefix = '/packages/abs/shipping-method-pkg/src';?>
 @else
     <?php $shipping_method_pkg_prefix = '';?>
