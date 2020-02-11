@@ -14,8 +14,9 @@ class ShippingMethod extends Model {
 	protected $table = 'shipping_methods';
 	public $timestamps = true;
 	protected $fillable = [
-		'question',
-		'answer',
+		'name',
+		'delivery_time',
+		'charge',
 	];
 
 	public static function createFromObject($record_data) {

@@ -5,11 +5,11 @@ app.config(['$routeProvider', function($routeProvider) {
         template: '<shipping-method-list></shipping-method-list>',
         title: 'Shipping Methods',
     }).
-    when('/shipping-method-pkg/shipping_method/add', {
+    when('/shipping-method-pkg/shipping-method/add', {
         template: '<shipping-method-form></shipping-method-form>',
         title: 'Add Shipping Method',
     }).
-    when('/shipping-method-pkg/shipping_method/edit/:id', {
+    when('/shipping-method-pkg/shipping-method/edit/:id', {
         template: '<shipping-method-form></shipping-method-form>',
         title: 'Edit Shipping Method',
     });
@@ -21,8 +21,6 @@ app.component('shippingMethodList', {
         $scope.loading = true;
         var self = this;
         self.hasPermission = HelperService.hasPermission;
-        var table_scroll;
-        table_scroll = $('.page-main-content').height() - 37;
         var dataTable = $('#shipping_methods_list').DataTable({
             "dom": dom_structure,
             "language": {
@@ -46,7 +44,9 @@ app.component('shippingMethodList', {
             },
             columns: [
                 { data: 'action', searchable: false, class: 'action' },
-                { data: 'question', name: 'shipping_methods.question', searchable: true },
+                { data: 'name', name: 'shipping_methods.name', searchable: true },
+                { data: 'delivery_time', name: 'shipping_methods.delivery_time', searchable: true },
+                { data: 'charge', name: 'shipping_methods.charge', searchable: false },
             ],
             "infoCallback": function(settings, start, end, max, total, pre) {
                 $('#table_info').html(total + '/' + max)
@@ -63,7 +63,7 @@ app.component('shippingMethodList', {
         $('.page-header-content .search.display-inline-block .add_close_button').html('<button type="button" class="btn btn-img btn-add-close"><img src="' + image_scr2 + '" class="img-responsive"></button>');
         $('.page-header-content .refresh.display-inline-block').html('<button type="button" class="btn btn-refresh"><img src="' + image_scr3 + '" class="img-responsive"></button>');
         $('.add_new_button').html(
-            '<a href="#!/shipping-method-pkg/shipping_method/add" type="button" class="btn btn-secondary" dusk="add-btn">' +
+            '<a href="#!/shipping-method-pkg/shipping-method/add" type="button" class="btn btn-secondary" dusk="add-btn">' +
             'Add Shipping Method' +
             '</a>'
         );
@@ -76,18 +76,6 @@ app.component('shippingMethodList', {
             $('#shipping_methods_list').DataTable().ajax.reload();
         });
 
-        $('.dataTables_length select').select2();
-
-        $scope.clear_search = function() {
-            $('#search_shipping_method').val('');
-            $('#shipping_methods_list').DataTable().search('').draw();
-        }
-
-        var dataTables = $('#shipping_methods_list').dataTable();
-        $("#search_shipping_method").keyup(function() {
-            dataTables.fnFilter(this.value);
-        });
-
         //DELETE
         $scope.deleteShippingMethod = function($id) {
             $('#shipping_method_id').val($id);
@@ -95,25 +83,24 @@ app.component('shippingMethodList', {
         $scope.deleteConfirm = function() {
             $id = $('#shipping_method_id').val();
             $http.get(
-                shipping_method_delete_data_url + '/' + $id,
+                laravel_routes['deleteShippingMethod'], {
+                    params: {
+                        id: $id,
+                    }
+                }
             ).then(function(response) {
                 if (response.data.success) {
-                    $noty = new Noty({
-                        type: 'success',
-                        layout: 'topRight',
-                        text: 'ShippingMethod Deleted Successfully',
-                    }).show();
-                    setTimeout(function() {
-                        $noty.close();
-                    }, 3000);
-                    $('#shipping_methods_list').DataTable().ajax.reload(function(json) {});
-                    $location.path('/shipping-method-pkg/shipping_method/list');
+                    custom_noty('success', response.data.message);
+                    $('#shipping_methods_list').DataTable().ajax.reload();
+                    $scope.$apply();
+                } else {
+                    custom_noty('error', response.data.errors);
                 }
             });
         }
 
         //FOR FILTER
-        $('#shipping_method_code').on('keyup', function() {
+        /*$('#shipping_method_code').on('keyup', function() {
             dataTables.fnFilter();
         });
         $('#shipping_method_name').on('keyup', function() {
@@ -131,7 +118,7 @@ app.component('shippingMethodList', {
             $("#mobile_no").val('');
             $("#email").val('');
             dataTables.fnFilter();
-        }
+        }*/
 
         $rootScope.loading = false;
     }
@@ -141,10 +128,10 @@ app.component('shippingMethodList', {
 app.component('shippingMethodForm', {
     templateUrl: shipping_method_form_template_url,
     controller: function($http, $location, HelperService, $scope, $routeParams, $rootScope) {
-        get_form_data_url = typeof($routeParams.id) == 'undefined' ? laravel_routes['getShippingMethodFormData'] : laravel_routes['getShippingMethodFormData'] + '/' + $routeParams.id;
         var self = this;
         self.hasPermission = HelperService.hasPermission;
         self.angular_routes = angular_routes;
+        fileUpload();
         $http({
             url: laravel_routes['getShippingMethodFormData'],
             method: 'GET',
@@ -153,7 +140,9 @@ app.component('shippingMethodForm', {
             }
         }).then(function(response) {
             self.shipping_method = response.data.shipping_method;
+            self.attachment = response.data.attachment;
             self.action = response.data.action;
+            self.theme = response.data.theme;
             $rootScope.loading = false;
             if (self.action == 'Edit') {
                 if (self.shipping_method.deleted_at) {
@@ -161,28 +150,59 @@ app.component('shippingMethodForm', {
                 } else {
                     self.switch_value = 'Active';
                 }
+                if (self.attachment) {
+                    $scope.PreviewImage = 'public/themes/' + self.theme + '/img/shipping_method_logo/' + self.attachment.name;
+                    $('#edited_file_name').val(self.attachment.name);
+                } else {
+                    $('#edited_file_name').val('');
+                }
             } else {
                 self.switch_value = 'Active';
             }
         });
 
+        $scope.SelectFile = function(e) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                $scope.PreviewImage = e.target.result;
+                $scope.$apply();
+            };
+            reader.readAsDataURL(e.target.files[0]);
+        };
+
         var form_id = '#form';
         var v = jQuery(form_id).validate({
             ignore: '',
+            errorPlacement: function(error, element) {
+                if (element.attr("name") == "logo_id") {
+                    error.insertAfter("#attachment_error");
+                } else {
+                    error.insertAfter(element);
+                }
+            },
             rules: {
-                'question': {
+                'name': {
+                    required: true,
+                    minlength: 3,
+                    maxlength: 191,
+                },
+                'delivery_time': {
                     required: true,
                     minlength: 3,
                     maxlength: 255,
                 },
-                'answer': {
+                'logo_id': {
+                    extension: "jpg|jpeg|png|ico|bmp|svg|gif",
+                },
+                'charge': {
                     required: true,
-                    minlength: 3,
-                    maxlength: 255,
+                    number: true,
                 },
             },
-            invalidHandler: function(event, validator) {
-                checkAllTabNoty()
+            messages: {
+                'logo_id': {
+                    extension: "Accept Image Files Only. Eg: jpg,jpeg,png,ico,bmp,svg,gif"
+                }
             },
             submitHandler: function(form) {
                 let formData = new FormData($(form_id)[0]);
@@ -202,7 +222,11 @@ app.component('shippingMethodForm', {
                         } else {
                             if (!res.success == true) {
                                 $('#submit').button('reset');
-                                showErrorNoty(res)
+                                var errors = '';
+                                for (var i in res.errors) {
+                                    errors += '<li>' + res.errors[i] + '</li>';
+                                }
+                                custom_noty('error', errors);
                             } else {
                                 $('#submit').button('reset');
                                 $location.path('/shipping-method-pkg/shipping-method/list');
@@ -212,7 +236,7 @@ app.component('shippingMethodForm', {
                     })
                     .fail(function(xhr) {
                         $('#submit').button('reset');
-                        showServerErrorNoty()
+                        custom_noty('error', 'Something went wrong at server');
                     });
             }
         });
