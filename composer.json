@@ -1,6 +1,6 @@
 {
     "name": "abs/shipping-method-pkg",
-    "description": "For ShippingMethod CRUD",
+    "description": "For Shipping Method CRUD",
     "type": "library",
     "require":
     {},
