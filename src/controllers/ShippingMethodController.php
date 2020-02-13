@@ -190,7 +190,7 @@ class ShippingMethodController extends Controller {
 		try {
 			$shipping_method = ShippingMethod::withTrashed()->where('id', $request->id)->first();
 			if (!is_null($shipping_method->logo_id)) {
-				Attachment::where('attachment_of_id', 20)->where('entity_id', $request->id)->forceDelete();
+				Attachment::where('company_id', Auth::user()->company_id)->where('attachment_of_id', 20)->where('entity_id', $request->id)->forceDelete();
 			}
 			ShippingMethod::withTrashed()->where('id', $request->id)->forceDelete();
 
