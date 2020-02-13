@@ -188,8 +188,12 @@ class ShippingMethodController extends Controller {
 	public function deleteShippingMethod(Request $request) {
 		DB::beginTransaction();
 		try {
+			$shipping_method = ShippingMethod::withTrashed()->where('id', $request->id)->first();
+			if (!is_null($shipping_method->logo_id)) {
+				Attachment::where('company_id', Auth::user()->company_id)->where('attachment_of_id', 20)->where('entity_id', $request->id)->forceDelete();
+			}
 			ShippingMethod::withTrashed()->where('id', $request->id)->forceDelete();
-			Attachment::where('attachment_of_id', 20)->where('entity_id', $request->id)->forceDelete();
+
 			DB::commit();
 			return response()->json(['success' => true, 'message' => 'Shipping Method Deleted Successfully']);
 		} catch (Exception $e) {
