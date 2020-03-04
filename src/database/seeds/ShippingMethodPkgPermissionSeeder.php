@@ -12,7 +12,7 @@ class ShippingMethodPkgPermissionSeeder extends Seeder {
 	 */
 	public function run() {
 		$permissions = [
-			//FAQ
+			//Shipping Methods
 			[
 				'display_order' => 99,
 				'parent' => null,
@@ -28,7 +28,7 @@ class ShippingMethodPkgPermissionSeeder extends Seeder {
 			[
 				'display_order' => 2,
 				'parent' => 'shipping-methods',
-				'name' => 'delete-shipping-method',
+				'name' => 'edit-shipping-method',
 				'display_name' => 'Edit',
 			],
 			[

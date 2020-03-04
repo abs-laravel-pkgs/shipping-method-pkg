@@ -1,20 +1,3 @@
-app.config(['$routeProvider', function($routeProvider) {
-
-    $routeProvider.
-    when('/shipping-method-pkg/shipping-method/list', {
-        template: '<shipping-method-list></shipping-method-list>',
-        title: 'Shipping Methods',
-    }).
-    when('/shipping-method-pkg/shipping-method/add', {
-        template: '<shipping-method-form></shipping-method-form>',
-        title: 'Add Shipping Method',
-    }).
-    when('/shipping-method-pkg/shipping-method/edit/:id', {
-        template: '<shipping-method-form></shipping-method-form>',
-        title: 'Edit Shipping Method',
-    });
-}]);
-
 app.component('shippingMethodList', {
     templateUrl: shipping_method_list_template_url,
     controller: function($http, $location, HelperService, $scope, $routeParams, $rootScope, $location) {

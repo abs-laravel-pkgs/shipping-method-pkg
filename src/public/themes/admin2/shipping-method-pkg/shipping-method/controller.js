@@ -1,20 +1,3 @@
-app.config(['$routeProvider', function($routeProvider) {
-
-    $routeProvider.
-    when('/shipping-method-pkg/shipping-method/list', {
-        template: '<shipping-method-list></shipping-method-list>',
-        title: 'Shipping Methods',
-    }).
-    when('/shipping-method-pkg/shipping-method/add', {
-        template: '<shipping-method-form></shipping-method-form>',
-        title: 'Add Shipping Method',
-    }).
-    when('/shipping-method-pkg/shipping-method/edit/:id', {
-        template: '<shipping-method-form></shipping-method-form>',
-        title: 'Edit Shipping Method',
-    });
-}]);
-
 app.component('shippingMethodList', {
     templateUrl: shipping_method_list_template_url,
     controller: function($http, $location, HelperService, $scope, $routeParams, $rootScope, $location) {
@@ -104,13 +87,13 @@ app.component('shippingMethodList', {
                     $noty = new Noty({
                         type: 'success',
                         layout: 'topRight',
-                        text: 'ShippingMethod Deleted Successfully',
+                        text: 'Shipping Method Deleted Successfully',
                     }).show();
                     setTimeout(function() {
                         $noty.close();
                     }, 3000);
                     $('#shipping_methods_list').DataTable().ajax.reload(function(json) {});
-                    $location.path('/shipping-method-pkg/shipping_method/list');
+                    $location.path('/shipping-method-pkg/shipping-method/list');
                 }
             });
         }
@@ -311,7 +294,7 @@ app.component('shippingMethodForm', {
                             setTimeout(function() {
                                 $noty.close();
                             }, 3000);
-                            $location.path('/shipping-method-pkg/shipping_method/list');
+                            $location.path('/shipping-method-pkg/shipping-method/list');
                             $scope.$apply();
                         } else {
                             if (!res.success == true) {
@@ -330,7 +313,7 @@ app.component('shippingMethodForm', {
                                 }, 3000);
                             } else {
                                 $('#submit').button('reset');
-                                $location.path('/shipping-method-pkg/shipping_method/list');
+                                $location.path('/shipping-method-pkg/shipping-method/list');
                                 $scope.$apply();
                             }
                         }

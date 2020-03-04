@@ -3,7 +3,7 @@ app.config(['$routeProvider', function($routeProvider) {
     $routeProvider.
     when('/shipping-methods', {
         template: '<shipping-methods></shipping-methods>',
-        title: 'ShippingMethods',
+        title: 'Shipping Methods',
     });
 }]);
 
