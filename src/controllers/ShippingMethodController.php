@@ -1,7 +1,7 @@
 <?php
 
 namespace Abs\ShippingMethodPkg;
-use Abs\Basic\Attachment;
+use Abs\BasicPkg\Attachment;
 use Abs\ShippingMethodPkg\ShippingMethod;
 use App\Http\Controllers\Controller;
 use Auth;
