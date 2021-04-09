@@ -1,8 +1,8 @@
 <?php
 
 namespace Abs\ShippingMethodPkg;
-use Abs\BasicPkg\Attachment;
-use Abs\ShippingMethodPkg\ShippingMethod;
+use Abs\BasicPkg\Models\Attachment;
+use App\ShippingMethod;
 use App\Http\Controllers\Controller;
 use Auth;
 use Carbon\Carbon;
@@ -14,7 +14,7 @@ use Yajra\Datatables\Datatables;
 
 class ShippingMethodController extends Controller {
 
-	private $company_id;
+	public $company_id;
 	public function __construct() {
 		$this->data['theme'] = config('custom.admin_theme');
 		$this->company_id = config('custom.company_id');
