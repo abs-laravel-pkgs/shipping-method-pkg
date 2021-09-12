@@ -11,25 +11,28 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Input;
 
-class ShippingMethodPkg extends BaseModel {
+class ShippingMethodPkg extends BaseModel
+{
 	use CompanyableTrait;
 	use SeederTrait;
 	use SoftDeletes;
+
 	protected $table = 'shipping_methods';
 	public $timestamps = true;
 
-	public function __construct(array $attributes = []) {
+	public function __construct(array $attributes = [])
+	{
 		parent::__construct($attributes);
 		$this->rules = [
 			'name' => [
 				'min:3',
-				'unique:categories,name,' . Input::get('id'),
+				'unique:categories,name,'.Input::get('id'),
 			],
 			'display_order' => [
 			],
 			'seo_name' => [
 				'required',
-				'unique:categories,seo_name,' . Input::get('id'),
+				'unique:categories,seo_name,'.Input::get('id'),
 			],
 		];
 
@@ -47,6 +50,7 @@ class ShippingMethodPkg extends BaseModel {
 	];
 
 	protected $casts = [
+		'charge' => 'float',
 		//'has_free' => 'boolean',
 		//'has_free_shipping' => 'boolean',
 		//'is_best_selling' => 'boolean',
@@ -95,17 +99,14 @@ class ShippingMethodPkg extends BaseModel {
 			$relationships = array_merge($relationships, [
 				'logo',
 			]);
-		}
-		else if ($action === 'read') {
+		} elseif ($action === 'read') {
 			$relationships = array_merge($relationships, [
 				'logo',
 			]);
-		}
-		else if ($action === 'save') {
+		} elseif ($action === 'save') {
 			$relationships = array_merge($relationships, [
 			]);
-		}
-		else if ($action === 'options') {
+		} elseif ($action === 'options') {
 			$relationships = array_merge($relationships, [
 			]);
 		}
@@ -120,7 +121,7 @@ class ShippingMethodPkg extends BaseModel {
 		if ($action === 'index') {
 			$relationships = array_merge($relationships, [
 			]);
-		} else if ($action === 'options') {
+		} elseif ($action === 'options') {
 			$relationships = array_merge($relationships, [
 			]);
 		}
@@ -136,38 +137,45 @@ class ShippingMethodPkg extends BaseModel {
 
 	// Relationships --------------------------------------------------------------
 
-	public function logo(): BelongsTo {
+	public function logo(): BelongsTo
+	{
 		return $this->belongsTo('Abs\BasicPkg\Attachment', 'logo_id');
 	}
 
 	//--------------------- Query Scopes -------------------------------------------------------
-	public function scopeFilterSearch($query, $term): void {
+	public function scopeFilterSearch($query, $term): void
+	{
 		if ($term !== '') {
 			$query->where(function ($query) use ($term) {
-				$query->orWhere('name', 'LIKE', '%' . $term . '%');
+				$query->orWhere('name', 'LIKE', '%'.$term.'%');
 			});
 		}
 	}
 
-	public static function createFromObject($record_data, $company = null) {
+	public static function createFromObject($record_data, $company = null)
+	{
 
 		$errors = [];
 		if (!$company) {
-			$company = \App\Models\Company::where('code', $record_data->company_code)->first();
+			$company = \App\Models\Company::where('code', $record_data->company_code)
+				->first();
 		}
 		if (!$company) {
-			dump('Invalid Company : ' . $record_data->company_code);
+			dump('Invalid Company : '.$record_data->company_code);
+
 			return;
 		}
 
 		$admin = $company->admin();
 		if (!$admin) {
 			dump('Default Admin user not found');
+
 			return;
 		}
 
 		if (count($errors) > 0) {
 			dump($errors);
+
 			return;
 		}
 
