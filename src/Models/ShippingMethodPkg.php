@@ -2,13 +2,16 @@
 
 namespace Abs\ShippingMethodPkg\Models;
 
+use Abs\BasicPkg\Models\V1\Attachment;
 use Abs\CompanyPkg\Traits\CompanyableTrait;
 use Abs\HelperPkg\Traits\SeederTrait;
 use App\Company;
 use App\Config;
 use App\Models\BaseModel;
+use App\ShippingMethod;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Input;
 
 class ShippingMethodPkg extends BaseModel
@@ -30,10 +33,10 @@ class ShippingMethodPkg extends BaseModel
 			],
 			'display_order' => [
 			],
-			'seo_name' => [
-				'required',
-				'unique:categories,seo_name,'.Input::get('id'),
-			],
+//			'seo_name' => [
+//				'required',
+//				'unique:categories,seo_name,'.Input::get('id'),
+//			],
 		];
 
 	}
@@ -104,6 +107,7 @@ class ShippingMethodPkg extends BaseModel
 				'logo',
 			]);
 		} elseif ($action === 'save') {
+
 			$relationships = array_merge($relationships, [
 			]);
 		} elseif ($action === 'options') {
@@ -139,7 +143,7 @@ class ShippingMethodPkg extends BaseModel
 
 	public function logo(): BelongsTo
 	{
-		return $this->belongsTo('Abs\BasicPkg\Attachment', 'logo_id');
+		return $this->belongsTo('Abs\BasicPkg\Models\Attachment', 'logo_id');
 	}
 
 	//--------------------- Query Scopes -------------------------------------------------------
@@ -191,4 +195,7 @@ class ShippingMethodPkg extends BaseModel
 		}
 		$record->save();
 	}
+
+
+
 }
