@@ -50,6 +50,7 @@ class ShippingMethodPkg extends BaseModel
 		'name',
 		'delivery_time',
 		'charge',
+        'logo_id'
 	];
 
 	protected $casts = [
@@ -109,6 +110,7 @@ class ShippingMethodPkg extends BaseModel
 		} elseif ($action === 'save') {
 
 			$relationships = array_merge($relationships, [
+                'logo'
 			]);
 		} elseif ($action === 'options') {
 			$relationships = array_merge($relationships, [
@@ -143,7 +145,7 @@ class ShippingMethodPkg extends BaseModel
 
 	public function logo(): BelongsTo
 	{
-		return $this->belongsTo('Abs\BasicPkg\Models\Attachment', 'logo_id');
+		return $this->belongsTo(\App\Models\Attachment::class, 'logo_id');
 	}
 
 	//--------------------- Query Scopes -------------------------------------------------------
